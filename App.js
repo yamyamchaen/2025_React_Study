@@ -1,14 +1,78 @@
-import React from 'react';
-import Introduce from './Introduce';
-import './App.css';
+import React, { useRef, useState } from 'react';
+import UserList from './UserList';
+import CreateUser from './CreateUser';
 
 function App() {
-  return (
-      <div className="app-wrapper">
-        <h1 className="title">✨ 자기소개 카드 ✨</h1>
-        <Introduce name="정채은" age="23" hobby="포켓몬" />
-      </div>
-  );
+    const [inputs, setInputs] = useState({
+        todolist: ''
+    });
+    const { todolist } = inputs;
+
+    const onChange = e => {
+        const { name, value } = e.target;
+        setInputs({
+            ...inputs,
+            [name]: value
+        });
+    };
+
+    const [users, setUsers] = useState([
+        {
+            id: 1,
+            todolist: '똥싸기',
+            active: true,
+            completed: false
+        },
+        {
+            id: 2,
+            todolist: '세수하기',
+            active: false,
+            completed: false
+        },
+        {
+            id: 3,
+            todolist: '밥먹기',
+            active: false,
+            completed: false
+        }
+    ]);
+
+    const nextId = useRef(4);
+
+    const onCreate = () => {
+        const user = {
+            id: nextId.current,
+            todolist,
+            active: false,
+            completed: false
+        };
+        setUsers(users.concat(user));
+        setInputs({ todolist: '' });
+        nextId.current += 1;
+    };
+
+    const onRemove = id => {
+        setUsers(users.filter(user => user.id !== id));
+    };
+
+    const onToggle = id => {
+        setUsers(
+            users.map(user =>
+                user.id === id ? { ...user, completed: !user.completed } : user
+            )
+        );
+    };
+
+    return (
+        <>
+            <CreateUser
+                username={todolist}
+                onChange={onChange}
+                onCreate={onCreate}
+            />
+            <UserList users={users} onRemove={onRemove} onToggle={onToggle} />
+        </>
+    );
 }
 
 export default App;
